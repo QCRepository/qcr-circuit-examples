@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 # Note: this script was created from the notebook Coding with Qiskit Episode 6
 # covering Bernstein-Vazirani Algorithm
 # 
