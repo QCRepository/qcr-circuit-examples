@@ -39,7 +39,7 @@ r"""
 # 
 # Using a quantum computer, we can solve this problem with 100% confidence after only one call to the function $f(x)$, provided we have the function $f$ implemented as a quantum oracle, which maps the state $\vert x\rangle \vert y\rangle $ to $ \vert x\rangle \vert y \oplus f(x)\rangle$, where $\oplus$ is addition modulo $2$. Below is the generic circuit for the Deutsch-Jozsa algorithm.
 # 
-# ![image1](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/deutsch_jozsa/deutsch_balanced1.svg)
+# ![image1](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/deutsch_jozsa/deutsch_steps.png)
 # 
 # Now, let's go through the steps of the algorithm:
 # 
@@ -175,7 +175,7 @@ r"""
 # 
 # For a balanced function, there are many different circuits we can create. One of the ways we can guarantee our circuit is balanced is by performing a CNOT for each qubit in register 1, with the qubit in register 2 as the target. For example:
 # 
-# ![image2](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/deutsch_jozsa/deutsch_balanced2.svg)
+# ![image2](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/deutsch_jozsa/deutsch_balanced1.svg)
 #
 # In the image above, the top three qubits form the input register, and the bottom qubit is the output register. We can see which input states give which output in the table below:
 # 
@@ -189,7 +189,7 @@ r"""
 # 
 # We can change the results while keeping them balanced by wrapping selected controls in X-gates. For example, see the circuit and its results table below:
 # 
-# ![other_balanced_circuit](images/deutsch_balanced2.svg)
+# ![other_balanced_circuit](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/deutsch_jozsa/deutsch_balanced2.svg)
 # 
 # | Input states that output 0 | Input states that output 1 |
 # |:--------------------------:|:--------------------------:|
