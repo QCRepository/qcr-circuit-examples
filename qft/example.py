@@ -56,11 +56,11 @@
 # 
 # In the computational basis, we store numbers in binary using the states $|0\rangle$ and $|1\rangle$:
 # 
-# ![zbasiscounting](images/zbasis-counting.gif)
+# ![zbasiscounting](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/zbasis-counting.gif)
 # 
 # Note the frequency with which the different qubits change; the leftmost qubit flips with every increment in the number, the next with every 2 increments, the third with every 4 increments, and so on. In the Fourier basis, we store numbers using different rotations around the Z-axis:
 # 
-# ![fbasiscounting](images/fourierbasis-counting.gif)
+# ![fbasiscounting](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/fourierbasis-counting.gif)
 # 
 # The number we want to store dictates the angle at which each qubit is rotated around the Z-axis. In the state $|\widetilde{0}\rangle$, all qubits are in the state $|{+}\rangle$. As seen in the example above, to encode the state $|\widetilde{5}\rangle$ on 4 qubits, we rotated the leftmost qubit by $\tfrac{5}{2^n} = \tfrac{5}{16}$ full turns ($\tfrac{5}{16}\times 2\pi$ radians). The next qubit is turned double this ($\tfrac{10}{16}\times 2\pi$ radians, or $10/16$ full turns), this angle is then doubled for the qubit after, and so on. 
 # 
@@ -139,8 +139,8 @@
 # $$
 # 
 # This is a mathematical description of the animation we saw in the intuition section:
-# 
-# ![fbasiscounting](images/fourierbasis-counting.gif)
+#
+# ![fbasiscounting](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/fourierbasis-counting.gif)
 
 # ## 5. The Circuit that Implements the QFT <a name="circuit"></a>
 # 
@@ -182,7 +182,7 @@
 # 
 # Given these two gates, a circuit that implements [an n-qubit QFT](#qfteqn) is shown below.
 # 
-# ![image1](images/qft.png)
+# ![qft](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/qft.gif)
 # 
 # The circuit operates as follows. We start with an n-qubit input state $\vert x_1x_2\ldots x_n\rangle$.
 # 
