@@ -99,7 +99,7 @@
 #
 # Let's see the example of Simon's algorithm for 2 qubits with the secret string $b=11$, so that $f(x) = f(y)$ if $y = x \oplus b$. The quantum circuit to solve the problem is:
 #
-# ![image2](images/simon_example.png)
+# ![image2](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/simon/simon_example.png)
 #
 # 1. Two $2$-qubit input registers are initialized to the zero state:
 #

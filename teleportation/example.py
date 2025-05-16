@@ -15,7 +15,7 @@
 # ## 2. The Quantum Teleportation Protocol <a id='how'></a>
 # To transfer a quantum bit, Alice and Bob must use a third party (Telamon) to send them an entangled qubit pair. Alice then performs some operations on her qubit, sends the results to Bob over a classical communication channel, and Bob then performs some operations on his end to receive Alice’s qubit.
 # 
-# ![teleportation_doodle](images/tele1.jpg)
+# ![teleportation_doodle](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/teleportation/tele1.jpg)
 # 
 # We will describe the steps on a quantum circuit below. Here, no qubits are actually ‘sent’, you’ll just have to imagine that part!
 # 
