@@ -182,7 +182,7 @@
 # 
 # Given these two gates, a circuit that implements [an n-qubit QFT](#qfteqn) is shown below.
 # 
-# ![qft](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/qft.gif)
+# ![qft](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/qft/qft.png)
 # 
 # The circuit operates as follows. We start with an n-qubit input state $\vert x_1x_2\ldots x_n\rangle$.
 # 
