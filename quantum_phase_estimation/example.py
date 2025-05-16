@@ -9,7 +9,7 @@
 # ## 1. Overview <a id='overview'></a>
 
 # The general quantum circuit for phase estimation is shown below. The top register contains $t$ 'counting' qubits, and the bottom contains qubits in the state $|\psi\rangle$:
-# ![image1](images/qpe_tex_qz.png)
+# ![image1](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/quantum_phase_estimation/qpe_tex_qz.png)
 # 
 
 # ### 1.1 Intuition <a id='intuition'></a>
@@ -17,7 +17,7 @@
 # 
 # We remember (from the QFT chapter) that in the Fourier basis the topmost qubit completes one full rotation when counting between $0$ and $2^t$. To count to a number, $x$ between $0$ and $2^t$, we rotate this qubit by $\tfrac{x}{2^t}$ around the z-axis. For the next qubit we rotate by $\tfrac{2x}{2^t}$, then $\tfrac{4x}{2^t}$ for the third qubit.
 # 
-# ![image2](images/qpe_intuition.jpg)
+# ![image2](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/quantum_phase_estimation/qpe_intuition.jpg)
 # 
 # When we use a qubit to control the $U$-gate, the qubit will turn (due to kickback) proportionally to the phase $e^{2i\pi\theta}$. We can use successive $CU$-gates to repeat this rotation an appropriate number of times until we have encoded the phase theta as a number between $0$ and $2^t$ in the Fourier basis. 
 # 
