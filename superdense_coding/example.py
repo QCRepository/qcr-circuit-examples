@@ -30,7 +30,7 @@
 # 
 # ## 2. The Process <a id='process'></a>
 # 
-# ![image1](images/superdense.jpg)
+# ![image1](https://raw.githubusercontent.com/QCRepository/qcr-circuit-examples/develop/superdense_coding/superdense.jpg)
 # 
 # ### 2.1 Step 1 <a id='step1'></a>
 # The process starts with a third party, who we'll call Charlie. Two qubits are prepared by Charlie in an entangled state. He initially starts the 2 qubits in the basis state $|0\rangle$. He applies Hadamard gate ($H$) to the first qubit to create superposition. He then applies CNOT gate ($CX$) using the first qubit as a control and the second as the target. This is the entangled state (Bell pair) we mentioned earlier. 
