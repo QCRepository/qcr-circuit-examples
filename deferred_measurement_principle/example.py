@@ -2,6 +2,9 @@
 
 # This notebook demonstrates quantum teleportation in two ways: with
 # mid-circuit measurements and by applying the deferred measurement principle.
+#
+# These two circuits produce the same probability distribution.
+#
 # We use Qiskit's built-in simulators to test our quantum circuit.
 import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
