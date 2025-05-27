@@ -66,6 +66,8 @@ def steane_code_circuit(code_quantum_register):
 
     return qc
 
+# Creating the code quantum register of 7 qubits
+# Note: these qubits could be in an arbitrary joint quantum state
 code_qr = QuantumRegister(7, "code")
 circuit = steane_code_circuit(code_qr)
 
