@@ -50,8 +50,8 @@ echo "Using: $REQ_FILE"
 echo "Run examples: $RUN_EXAMPLE"
 echo ""
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get repository root (script is in .github/scripts/)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # Find all example directories (directories containing example.py)
 if [ -n "$SPECIFIC_EXAMPLE" ]; then
