@@ -1,0 +1,106 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      example:
+        description: 'Specific example to test (leave empty for all)'
+        required: false
+        default: ''
+      run_examples:
+        description: 'Run example.py files'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  test-requirements:
+    name: Test Requirements
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Display Python version
+        run: python --version
+
+      - name: Make test script executable
+        run: chmod +x .github/scripts/test_requirements.sh
+
+      - name: Test all examples (locked versions)
+        if: github.event_name == 'pull_request' || github.event.inputs.example == ''
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            ./.github/scripts/test_requirements.sh --lock --run
+          elif [ "${{ github.event.inputs.run_examples }}" == "true" ]; then
+            ./.github/scripts/test_requirements.sh --lock --run
+          else
+            ./.github/scripts/test_requirements.sh --lock
+          fi
+
+      - name: Test specific example
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.example != ''
+        run: |
+          if [ "${{ github.event.inputs.run_examples }}" == "true" ]; then
+            ./.github/scripts/test_requirements.sh --lock --run ${{ github.event.inputs.example }}
+          else
+            ./.github/scripts/test_requirements.sh --lock ${{ github.event.inputs.example }}
+          fi
+
+  test-matrix:
+    name: Test ${{ matrix.example }}
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - grover
+          - qft
+          - teleportation
+          - deutsch_jozsa
+          - bernstein_vazirani
+          - simon
+          - shor
+          - vqe
+          - hhl
+          - quantum_phase_estimation
+          - superdense_coding
+          - repetition_code
+          - steane_code
+          - shor_code
+          - bacon_shor_code
+          - boson_sampling
+          - gaussian_boson_sampling
+          - mottonen_state_preparation
+          - deferred_measurement_principle
+          - 1_original_brassard_et_al
+          - 2_iterative_amplitude_estimation
+          - 3_max_likelihood_amplitude_estimation
+          - 4_faster_amplitude_estimation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Make test script executable
+        run: chmod +x .github/scripts/test_requirements.sh
+
+      - name: Test ${{ matrix.example }}
+        run: ./.github/scripts/test_requirements.sh --lock --run ${{ matrix.example }}

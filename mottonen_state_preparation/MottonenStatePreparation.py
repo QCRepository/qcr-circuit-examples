@@ -17,7 +17,7 @@ from typing import List, Union
 import numpy as np
 from qiskit import QuantumRegister, QuantumCircuit
 from qiskit.circuit import Gate, Instruction, Qubit
-from qiskit.extensions import RYGate, RZGate
+from qiskit.circuit.library import RYGate, RZGate
 from scipy import sparse
 from scipy.sparse.linalg import norm
 

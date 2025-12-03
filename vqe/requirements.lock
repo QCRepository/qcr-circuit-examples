@@ -1,0 +1,7 @@
+# Locked versions for exact reproducibility
+
+qiskit==1.4.0
+qiskit-aer==0.15.1
+qiskit-ibm-runtime==0.34.0
+numpy==1.26.4
+scipy==1.14.0
