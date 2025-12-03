@@ -18,7 +18,7 @@ from typing import List, Tuple, Union, Callable, Iterable
 import numpy as np
 from qiskit import QuantumRegister, QuantumCircuit
 from qiskit.circuit import Gate, Instruction, Qubit, Clbit, InstructionSet
-from qiskit.extensions import HGate, RZGate, RYGate, CXGate
+from qiskit.circuit.library import HGate, RZGate, RYGate, CXGate
 from scipy import sparse
 
 log = logging.getLogger('UniformRotation')

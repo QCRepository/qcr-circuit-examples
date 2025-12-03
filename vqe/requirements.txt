@@ -2,5 +2,6 @@
 
 qiskit>=1.4.0,<2.0.0
 qiskit-aer>=0.15.0
+qiskit-ibm-runtime>=0.30.0
 numpy>=1.23.0
 scipy>=1.10.0
