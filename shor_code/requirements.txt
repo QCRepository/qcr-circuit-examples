@@ -1,0 +1,5 @@
+# Shor 9-Qubit Code
+
+qiskit>=1.4.0,<2.0.0
+qiskit-aer>=0.15.0
+numpy>=1.23.0

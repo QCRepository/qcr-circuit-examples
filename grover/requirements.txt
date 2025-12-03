@@ -1,0 +1,7 @@
+# Grover's Search Algorithm
+# Python 3.10+ recommended
+
+qiskit>=1.4.0,<2.0.0
+qiskit-aer>=0.15.0
+numpy>=1.23.0
+matplotlib>=3.7.0
