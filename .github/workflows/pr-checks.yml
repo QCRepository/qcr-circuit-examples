@@ -41,7 +41,9 @@ jobs:
       - name: Test all examples (locked versions)
         if: github.event_name == 'pull_request' || github.event.inputs.example == ''
         run: |
-          if [ "${{ github.event.inputs.run_examples }}" == "true" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            ./.github/scripts/test_requirements.sh --lock --run
+          elif [ "${{ github.event.inputs.run_examples }}" == "true" ]; then
             ./.github/scripts/test_requirements.sh --lock --run
           else
             ./.github/scripts/test_requirements.sh --lock
@@ -101,4 +103,4 @@ jobs:
         run: chmod +x .github/scripts/test_requirements.sh
 
       - name: Test ${{ matrix.example }}
-        run: ./.github/scripts/test_requirements.sh --lock ${{ matrix.example }}
+        run: ./.github/scripts/test_requirements.sh --lock --run ${{ matrix.example }}
