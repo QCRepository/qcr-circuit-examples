@@ -1,6 +1,13 @@
+"""
+Mottonen State Preparation implementation.
+
+Prepares an arbitrary quantum state using the algorithm by Mottonen et al.,
+which decomposes the state into uniformly controlled rotations.
+"""
+
 import numpy as np
 
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister 
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, qasm3
 from qiskit_aer import AerSimulator
 
 from MottonenStatePreparation import state_prep_möttönen
@@ -19,3 +26,9 @@ qc = qc.decompose(reps=2)
 
 # You can draw the circuit by uncommenting the following line:
 # qc.draw()
+
+# Export OpenQASM 3.0
+with open('mottonen_state_prep.qasm', 'w') as f:
+    f.write(qasm3.dumps(qc))
+print(f"Exported OpenQASM 3.0 to mottonen_state_prep.qasm")
+print(f"Circuit stats: {qc.num_qubits} qubits, {qc.depth()} depth, {qc.size()} gates")

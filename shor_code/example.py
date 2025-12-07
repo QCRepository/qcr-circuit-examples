@@ -1,13 +1,9 @@
-# Shor code example
-#
-# This example includes a quantum circuit that encodes a qubit using Shor's
-# code structure and diagnoses X and Z errors. Correcting errors are not
-# included. Corrections can be performed by post-processing the measurement
-# outcomes of measuring auxiliary qubits.
-#
-# Also note: no "error" gates are included in the circuit, such gates have to
-# be added if desired.
-#
+"""
+Shor Code implementation for quantum error correction.
+
+A [[9,1,3]] code that encodes one logical qubit into nine physical
+qubits, capable of correcting any single-qubit error (X, Y, or Z).
+"""
 from qiskit_aer import AerSimulator
 from qiskit import QuantumRegister, QuantumCircuit
 from qiskit import ClassicalRegister

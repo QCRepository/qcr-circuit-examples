@@ -1,12 +1,9 @@
-# Bacon-Shor code 2x2 example in the X basis
-#
-# Uses the circuit construction from the following repository:
-#
-# https://github.com/Strilanc/more-bacon-less-threshold
-#
-# Note: for further generalized constructions of the Bacon-Shor code, refer to
-# the ``make_bacon_shor_circuit`` and relevant functions in the mentioned
-# repository. Required packages have to be installed such as ``stim``.
+"""
+Bacon-Shor Code 2x2 implementation in the X basis.
+
+A subsystem code that combines features of Bacon and Shor codes
+for fault-tolerant quantum error correction.
+"""
 from qiskit_aer import AerSimulator
 from qiskit import QuantumCircuit, transpile
 

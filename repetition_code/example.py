@@ -1,9 +1,10 @@
-# Repetition code example
-#
-# Note: the code used in this example uses code from the 
-# https://learning.quantum.ibm.com/tutorial/build-repetition-codes
-# IBM Quantum Learning tutorial.
-#
+"""
+Repetition Code implementation for quantum error correction.
+
+Encodes a single logical qubit into multiple physical qubits to
+detect and correct bit-flip errors.
+"""
+
 # Qiskit imports
 from qiskit_aer import AerSimulator
 from qiskit import transpile, QuantumCircuit, QuantumRegister, ClassicalRegister

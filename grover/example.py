@@ -1,3 +1,10 @@
+"""
+Grover's Algorithm implementation.
+
+Searches an unstructured database of N items in O(sqrt(N)) time,
+providing quadratic speedup over classical search.
+"""
+
 from argparse import ArgumentParser, Namespace, BooleanOptionalAction
 from qiskit import QuantumCircuit as qc
 from qiskit import QuantumRegister as qr

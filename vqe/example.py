@@ -1,3 +1,10 @@
+"""
+Variational Quantum Eigensolver (VQE) implementation.
+
+Finds the ground state energy of a Hamiltonian using a hybrid
+quantum-classical optimization approach.
+"""
+
 from qiskit_aer import AerSimulator
 import logging
 from typing import Optional

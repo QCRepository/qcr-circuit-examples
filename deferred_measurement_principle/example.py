@@ -1,162 +1,103 @@
-# Deferred measurement principle
+"""
+Deferred Measurement Principle demonstration.
 
-# This notebook demonstrates quantum teleportation in two ways: with
-# mid-circuit measurements and by applying the deferred measurement principle.
-#
-# These two circuits produce the same probability distribution.
-#
-# We use Qiskit's built-in simulators to test our quantum circuit.
-import numpy as np
+Shows that mid-circuit measurements can be replaced by quantum controlled
+operations followed by deferred measurements, producing identical results.
+"""
+
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit_aer import AerSimulator
-from qiskit.result import marginal_counts
-from qiskit.quantum_info import random_statevector
 
-qr = QuantumRegister(3, name="q")    # Protocol uses 3 qubits
-crz = ClassicalRegister(1, name="crz") # and 2 classical bits
-crx = ClassicalRegister(1, name="crx") # in 2 different registers
-teleportation_circuit_with_mid_circuit_measurements = QuantumCircuit(qr, crz, crx)
 
-def create_bell_pair(qc, a, b):
-    """Creates a bell pair in qc using qubits a & b"""
-    qc.h(a) # Put qubit a into state |+>
-    qc.cx(a,b) # CNOT with a as control and b as target
+def create_bell_pair(qc: QuantumCircuit, a: int, b: int) -> None:
+    """Create a Bell pair between qubits a and b."""
+    qc.h(a)
+    qc.cx(a, b)
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_mid_circuit_measurements = QuantumCircuit(qr, crz, crx)
 
-create_bell_pair(teleportation_circuit_with_mid_circuit_measurements, 1, 2)
-
-def alice_gates(qc, psi, a):
+def alice_gates(qc: QuantumCircuit, psi: int, a: int) -> None:
+    """Apply Alice's gates for teleportation."""
     qc.cx(psi, a)
     qc.h(psi)
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_mid_circuit_measurements = QuantumCircuit(qr, crz, crx)
 
-create_bell_pair(teleportation_circuit_with_mid_circuit_measurements, 1, 2)
-
-teleportation_circuit_with_mid_circuit_measurements.barrier() # Use barrier to separate steps
-alice_gates(teleportation_circuit_with_mid_circuit_measurements, 0, 1)
-
-def measure_and_send(qc, a, b):
-    """Measures qubits a & b and 'sends' the results to Bob"""
+def measure_and_send(qc: QuantumCircuit, a: int, b: int) -> None:
+    """Measure qubits a and b."""
     qc.barrier()
-    qc.measure(a,0)
-    qc.measure(b,1)
+    qc.measure(a, 0)
+    qc.measure(b, 1)
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_mid_circuit_measurements = QuantumCircuit(qr, crz, crx)
 
-create_bell_pair(teleportation_circuit_with_mid_circuit_measurements, 1, 2)
-
-teleportation_circuit_with_mid_circuit_measurements.barrier() # Use barrier to separate steps
-alice_gates(teleportation_circuit_with_mid_circuit_measurements, 0, 1)
-
-measure_and_send(teleportation_circuit_with_mid_circuit_measurements, 0 ,1)
-
-def bob_gates(qc, qubit, crz, crx):
-    # Here we use if_test to control our gates with a classical bit instead of
-    # a qubit
-    # Apply gates if the registers are in the state '1'
+def bob_gates_classical(
+    qc: QuantumCircuit, qubit: int, crz: ClassicalRegister, crx: ClassicalRegister
+) -> None:
+    """Apply Bob's corrections using classical control (mid-circuit measurement)."""
     with qc.if_test((crx, 1)):
         qc.x(qubit)
-
     with qc.if_test((crz, 1)):
         qc.z(qubit)
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_mid_circuit_measurements = QuantumCircuit(qr, crz, crx)
 
-create_bell_pair(teleportation_circuit_with_mid_circuit_measurements, 1, 2)
+def teleportation_with_mid_circuit_measurements() -> QuantumCircuit:
+    """
+    Teleportation using mid-circuit measurements and classical control.
 
-teleportation_circuit_with_mid_circuit_measurements.barrier() # Use barrier to separate steps
-alice_gates(teleportation_circuit_with_mid_circuit_measurements, 0, 1)
+    Returns:
+        Circuit with mid-circuit measurements
+    """
+    qr = QuantumRegister(3, name="q")
+    crz = ClassicalRegister(1, name="crz")
+    crx = ClassicalRegister(1, name="crx")
+    circuit = QuantumCircuit(qr, crz, crx)
 
-measure_and_send(teleportation_circuit_with_mid_circuit_measurements, 0, 1)
+    create_bell_pair(circuit, 1, 2)
+    circuit.barrier()
+    alice_gates(circuit, 0, 1)
+    measure_and_send(circuit, 0, 1)
+    circuit.barrier()
+    bob_gates_classical(circuit, 2, crz, crx)
 
-teleportation_circuit_with_mid_circuit_measurements.barrier() # Use barrier to separate steps
-bob_gates(teleportation_circuit_with_mid_circuit_measurements, 2, crz, crx)
+    return circuit
 
-sim = AerSimulator()
-sim_job = sim.run(teleportation_circuit_with_mid_circuit_measurements, shots=100000)
-result = sim_job.result()
-counts = result.get_counts()
 
-# If you want to draw the circuit, uncomment the following line:
-# print(teleportation_circuit_with_mid_circuit_measurements.draw())
-print(counts)
+def teleportation_with_deferred_measurements() -> QuantumCircuit:
+    """
+    Teleportation using deferred measurements (quantum controlled gates).
 
-# 2. circuit - no mid-circuit measurements
+    The mid-circuit measurements are replaced by quantum controlled operations,
+    with measurements deferred to the end.
 
-qr = QuantumRegister(3, name="q")    # Protocol uses 3 qubits
-teleportation_circuit_with_deferred_measurements = QuantumCircuit(qr, crz, crx)
+    Returns:
+        Circuit with deferred measurements
+    """
+    qr = QuantumRegister(3, name="q")
+    crz = ClassicalRegister(1, name="crz")
+    crx = ClassicalRegister(1, name="crx")
+    circuit = QuantumCircuit(qr, crz, crx)
 
-def create_bell_pair(qc, a, b):
-    """Creates a bell pair in qc using qubits a & b"""
-    qc.h(a) # Put qubit a into state |+>
-    qc.cx(a,b) # CNOT with a as control and b as target
+    create_bell_pair(circuit, 1, 2)
+    alice_gates(circuit, 0, 1)
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_deferred_measurements = QuantumCircuit(qr, crz, crx)
+    # Quantum controlled operations instead of classical control
+    circuit.cx(0, 2)
+    circuit.cz(1, 2)
 
-create_bell_pair(teleportation_circuit_with_deferred_measurements, 1, 2)
+    # Measurements deferred to end
+    measure_and_send(circuit, 0, 1)
 
-def alice_gates(qc, psi, a):
-    qc.cx(psi, a)
-    qc.h(psi)
+    return circuit
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_deferred_measurements = QuantumCircuit(qr, crz, crx)
 
-create_bell_pair(teleportation_circuit_with_deferred_measurements, 1, 2)
+if __name__ == "__main__":
+    simulator = AerSimulator()
+    shots = 100000
 
-teleportation_circuit_with_deferred_measurements.barrier() # Use barrier to separate steps
-alice_gates(teleportation_circuit_with_deferred_measurements, 0, 1)
+    # Run both circuits
+    circuit_mid = teleportation_with_mid_circuit_measurements()
+    circuit_deferred = teleportation_with_deferred_measurements()
 
-def measure_and_send(qc, a, b):
-    """Measures qubits a & b and 'sends' the results to Bob"""
-    qc.barrier()
-    qc.measure(a,0)
-    qc.measure(b,1)
+    result_mid = simulator.run(circuit_mid, shots=shots).result()
+    result_deferred = simulator.run(circuit_deferred, shots=shots).result()
 
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_deferred_measurements = QuantumCircuit(qr, crz, crx)
-
-create_bell_pair(teleportation_circuit_with_deferred_measurements, 1, 2)
-
-teleportation_circuit_with_deferred_measurements.barrier() # Use barrier to separate steps
-alice_gates(teleportation_circuit_with_deferred_measurements, 0, 1)
-
-measure_and_send(teleportation_circuit_with_deferred_measurements, 0 ,1)
-
-qr = QuantumRegister(3, name="q")
-crz, crx = ClassicalRegister(1, name="crz"), ClassicalRegister(1, name="crx")
-teleportation_circuit_with_deferred_measurements = QuantumCircuit(qr, crz, crx)
-
-create_bell_pair(teleportation_circuit_with_deferred_measurements, 1, 2)
-
-alice_gates(teleportation_circuit_with_deferred_measurements, 0, 1)
-
-# Apply the quantum controlled gates instead of classical control
-teleportation_circuit_with_deferred_measurements.cx(0, 2)
-teleportation_circuit_with_deferred_measurements.cz(1, 2)
-
-# Measure the qubits at the end of the circuit
-measure_and_send(teleportation_circuit_with_deferred_measurements, 0, 1)
-
-sim = AerSimulator()
-sim_job = sim.run(teleportation_circuit_with_deferred_measurements, shots=100000)
-result = sim_job.result()
-counts = result.get_counts()
-
-# If you want to draw the circuit, uncomment the following line:
-# print(teleportation_circuit_with_deferred_measurements.draw())
-print(counts)
+    print("Mid-circuit measurements:", result_mid.get_counts())
+    print("Deferred measurements:", result_deferred.get_counts())

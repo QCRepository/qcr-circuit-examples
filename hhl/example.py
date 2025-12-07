@@ -1,3 +1,10 @@
+"""
+HHL Algorithm implementation.
+
+Solves linear systems Ax = b exponentially faster than classical methods
+for sparse matrices with low condition number.
+"""
+
 import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import Isometry

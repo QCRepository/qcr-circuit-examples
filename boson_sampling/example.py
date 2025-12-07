@@ -1,13 +1,12 @@
+"""
+Boson Sampling implementation using Piquasso.
+
+Simulates the Aaronson-Arkhipov boson sampling scheme, demonstrating
+quantum computational advantage with linear optical networks.
+"""
+
 import piquasso as pq
 from scipy.stats import unitary_group
-
-"""Example of the boson sampling scheme proposed by Aaronson and Arkhipov using Piquasso.
-
-For more details on boson sampling, see:
-- [BosonSampling](https://en.wikipedia.org/wiki/Boson_sampling)
-- [Original Paper](https://arxiv.org/abs/1011.3245)
-- [Piquasso Documentation](https://piquasso.readthedocs.io/en/latest/tutorials/boson-sampling.html)
-"""
 
 def boson_sampling_program(input_state_vector, interferometer_matrix):
     """Construct a boson sampling quantum program using a given input state and interferometer matrix.
