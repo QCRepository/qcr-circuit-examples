@@ -1,8 +1,10 @@
 """
-Boson Sampling implementation using Piquasso.
+Example of the boson sampling scheme proposed by Aaronson and Arkhipov using Piquasso.
 
-Simulates the Aaronson-Arkhipov boson sampling scheme, demonstrating
-quantum computational advantage with linear optical networks.
+For more details on boson sampling, see:
+- [BosonSampling](https://en.wikipedia.org/wiki/Boson_sampling)
+- [Original Paper](https://arxiv.org/abs/1011.3245)
+- [Piquasso Documentation](https://piquasso.readthedocs.io/en/latest/tutorials/boson-sampling.html)
 """
 
 import piquasso as pq

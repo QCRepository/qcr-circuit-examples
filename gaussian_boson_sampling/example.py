@@ -1,8 +1,8 @@
-"""
-Gaussian Boson Sampling implementation using Piquasso.
+"""Example of the Gaussian Boson Sampling scheme proposed by Craig S. Hamilton et al. using Piquasso.
 
-Simulates the GBS scheme using squeezed states and linear optics,
-with applications in graph problems and molecular simulation.
+For more details on Gaussian Boson Sampling, see:
+- Gaussian Boson Sampling (original publication): https://doi.org/10.1103/PhysRevLett.119.170501
+- Piquasso Documentation page: https://piquasso.readthedocs.io/en/latest/tutorials/gaussian-boson-sampling.html
 """
 
 import piquasso as pq
