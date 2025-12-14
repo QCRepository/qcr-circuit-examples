@@ -7,7 +7,7 @@ which decomposes the state into uniformly controlled rotations.
 
 import numpy as np
 
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, qasm3
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
 from qiskit_aer import AerSimulator
 
 from MottonenStatePreparation import state_prep_möttönen
