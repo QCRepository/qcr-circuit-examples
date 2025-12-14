@@ -1,9 +1,17 @@
 """
 Steane Code implementation for quantum error correction.
 
-The quantum circuit includes measurements of the generators of the
-Steane code to produce the error syndrome.
+The quantum circuit in this example includes measurements of the generators
+of the Steane code, to give the error syndrome.
+
+The circuit is built as shown in Nielsen & Chuang's Quantum Computation and
+Quantum Information publication:
+
+Michael A. Nielsen; Isaac L. Chuang (9 December 2010). "4.4 Measurement".
+Quantum Computation and Quantum Information: 10th Anniversary Edition.
+Cambridge University Press. p. 186. ISBN 978-1-139-49548-6.
 """
+
 from qiskit_aer import AerSimulator
 from qiskit import QuantumCircuit, transpile, ClassicalRegister, QuantumRegister
 
