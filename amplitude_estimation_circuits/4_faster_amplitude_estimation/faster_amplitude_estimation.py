@@ -20,8 +20,8 @@ import numpy as np
 from qiskit.circuit import QuantumCircuit, ClassicalRegister
 from qiskit.primitives import BaseSampler, Sampler
 
-from amplitude_estimator import AmplitudeEstimator, AmplitudeEstimatorResult
-from estimation_problem import EstimationProblem
+from lib.amplitude_estimator import AmplitudeEstimator, AmplitudeEstimatorResult
+from lib.estimation_problem import EstimationProblem
 
 from qiskit.exceptions import QiskitError
 
