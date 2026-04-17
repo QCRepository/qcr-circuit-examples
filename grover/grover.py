@@ -12,7 +12,7 @@ from qiskit import transpile
 from qiskit_aer import AerSimulator
 from qiskit.result import Counts
 from matplotlib.pyplot import show, subplots, xticks, yticks
-from math import pi, sqrt
+from math import pi, sqrt, sin, asin
 from heapq import nlargest
 
 class GroversAlgorithm:
@@ -160,32 +160,55 @@ class GroversAlgorithm:
         return grover
 
     def _outcome(self, winners: list[str], counts: Counts) -> None:
-        """Print top measurement(s) (state(s) with highest frequency)
-        and target state(s) in binary and decimal form, determine
-        if top measurement(s) equals target state(s), then print result.
+        """Print a structured summary of the Grover run.
+
+        Shows the problem setup (qubits, targets, iterations), the theoretical
+        vs measured hit rate, and a per-target frequency table, so a reader can
+        see at a glance both what the algorithm did and whether it matched
+        theory.
 
         Args:
-            winners (list[str]): State(s) (N-qubit binary string(s))
-            with highest probability of being measured.
-            counts (Counts): Each state and its respective frequency.
+            winners: Top-frequency bitstrings (unused here; kept for signature
+                compatibility with the surrounding plotting code).
+            counts: Each measured state mapped to its shot count.
         """
-        print("WINNER(S):")
-        print(f"Binary = {winners}\nDecimal = {[ int(key, 2) for key in winners ]}\n")
-            
-        print("TARGET(S):")
-        print(f"Binary = {self._targets}\nDecimal = {self.search}\n")
+        n = self._args.n_qubits
+        N = 2 ** n
+        M = len(self._targets)
+        shots = self._args.shots
 
-        if not all(key in self._targets for key in winners): print("Target(s) not found...")
+        # Grover iterations: the integer optimum (π/4 · √(N/M))
+        optimal_float = (pi / 4) * sqrt(N / M)
+        iterations = int(optimal_float)
 
-        else:
-            winners_frequency, total = 0, 0
+        # Theoretical success probability after `iterations` rounds
+        theta = asin(sqrt(M / N))
+        theoretical_rate = sin((2 * iterations + 1) * theta) ** 2
 
-            for value, frequency in counts.items():
-                if value in winners:
-                    winners_frequency += frequency
-                total += frequency
-            
-            print(f"Target(s) found with {winners_frequency / total:.2%} accuracy!")
+        # Measured success: shots landing on any target state
+        target_shots = sum(counts.get(t, 0) for t in self._targets)
+        measured_rate = target_shots / shots
+
+        print(f"\nGrover's Search — {n} qubits (N = {N}), {M} targets, {shots} shots\n")
+        print(f"  Targets:              {sorted(self.search)}")
+        print(f"  Grover iterations:    {iterations}  "
+              f"(optimal: floor of π/4 · √(N/M) = {optimal_float:.2f})")
+        print(f"  Theoretical hit rate: {theoretical_rate:.1%}")
+        print(f"  Measured hit rate:    {measured_rate:.1%}  "
+              f"({target_shots} / {shots} shots landed on a target)")
+
+        print("\n  Target states — measurement frequency:")
+        for target_str in sorted(self._targets, key=lambda t: int(t, 2)):
+            decimal = int(target_str, 2)
+            count = counts.get(target_str, 0)
+            print(f"    |{target_str}> ({decimal:>3}) {count:>5} / {shots}")
+        non_target_shots = shots - target_shots
+        print(f"    (non-targets)    {non_target_shots:>5} / {shots}")
+
+        # Sanity check: all top outcomes should be targets when the algorithm
+        # is configured optimally.
+        if not all(key in self._targets for key in winners):
+            print("\n  Note: some top outcomes are NOT targets — iterations may be suboptimal.")
 
     def _show_histogram(self, histogram_data) -> None:
         """Print outcome and display histogram of simulation results.
