@@ -21,9 +21,9 @@ from scipy.optimize import bisect
 
 from qiskit import QuantumCircuit, ClassicalRegister
 from qiskit.primitives import BaseSampler, Sampler
-from amplitude_estimator import AmplitudeEstimator, AmplitudeEstimatorResult
-from utils import pdf_a, derivative_log_pdf_a, bisect_max
-from estimation_problem import EstimationProblem
+from lib.amplitude_estimator import AmplitudeEstimator, AmplitudeEstimatorResult
+from lib.utils import pdf_a, derivative_log_pdf_a, bisect_max
+from lib.estimation_problem import EstimationProblem
 
 from qiskit.exceptions import QiskitError
 
