@@ -6,6 +6,8 @@ using a single quantum query, demonstrating quantum advantage
 over classical algorithms.
 """
 
+import argparse
+
 import numpy as np
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
@@ -107,8 +109,15 @@ def run_oracle(case: str, n: int, simulator: AerSimulator, shots: int = 1024) ->
 
 
 if __name__ == "__main__":
-    n = 4
-    shots = 1024
+    parser = argparse.ArgumentParser(description="Run the Deutsch-Jozsa algorithm.")
+    parser.add_argument("-n", "--n-qubits", type=int, default=4,
+                        help="Number of input qubits (default: 4)")
+    parser.add_argument("-S", "--shots", type=int, default=1024,
+                        help="Number of simulation shots (default: 1024)")
+    args = parser.parse_args()
+
+    n = args.n_qubits
+    shots = args.shots
     simulator = AerSimulator()
 
     print(f"Deutsch-Jozsa — {n} input qubits, {shots} shots\n")
