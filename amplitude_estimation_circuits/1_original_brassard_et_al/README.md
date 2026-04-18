@@ -2,11 +2,11 @@
 
 The original Quantum Amplitude Estimation algorithm, introduced by Brassard, Hoyer, Mosca, and Tapp in 2000, answers a deceptively simple question: *given a quantum state, how large is the "good" component?*
 
-More precisely, given a unitary $\mathcal{A}$ that prepares:
+More precisely, given a unitary A that prepares
 
-$$\mathcal{A}|0\rangle = \sqrt{1 - a}\,|\Psi_0\rangle + \sqrt{a}\,|\Psi_1\rangle$$
+&nbsp;&nbsp;&nbsp;&nbsp;A|0⟩ = √(1 − a) |Ψ₀⟩ + √a |Ψ₁⟩
 
-the algorithm estimates the amplitude $a$ — the probability of measuring the "good" state $|\Psi_1\rangle$.
+the algorithm estimates the amplitude a — the probability of measuring the "good" state |Ψ₁⟩.
 
 ## Why it matters
 
@@ -16,27 +16,30 @@ Amplitude estimation is one of the most versatile subroutines in quantum computi
 
 The algorithm chains together two well-known building blocks:
 
-1. **Grover operator** ($\mathcal{Q}$) — reflects the quantum state to amplify the good component. The eigenvalues of $\mathcal{Q}$ encode the target amplitude $a$.
-2. **Quantum Phase Estimation (QPE)** — extracts those eigenvalues using $m$ auxiliary "evaluation" qubits, producing an estimate on a discrete grid of $2^m$ points.
+1. **Grover operator** (Q) — reflects the quantum state to amplify the good component. The eigenvalues of Q are e^(±2iθₐ) where θₐ ∈ [0, π/2] is the amplitude angle defined by sin²(θₐ) = a, so recovering θₐ gives us a.
+2. **Quantum Phase Estimation (QPE)** — extracts the normalized phase θₐ/π using m auxiliary "evaluation" qubits, producing an estimate on a discrete grid of 2^m points.
 
-Because the grid is discrete, the raw QPE output snaps to the nearest grid point. A **Maximum Likelihood Estimation (MLE)** post-processing step then refines this to a continuous value, recovering much better precision without additional quantum resources.
+Because the grid is discrete, the raw QPE output snaps to the nearest grid point. Modern implementations (including this one, which derives from Qiskit Algorithms) add a **Maximum Likelihood Estimation (MLE)** post-processing step — not part of the original Brassard et al. construction — that refines the snapped estimate to a continuous value, recovering better precision without additional quantum resources.
 
-This example uses a **Bernoulli model** — the simplest possible amplitude estimation problem — where $a = p = 0.2$ represents the probability of a biased coin.
+![Canonical QAE — QPE on the Grover operator](./qae_structure.png)
 
-## Project structure
+The evaluation register (top m qubits) holds the Hadamard superposition and receives the phase via controlled-Q^(2^k) operations; the eigenstate register (bottom n qubits) carries the amplitude-encoded state prepared by A. Inverse QFT on the evaluation register reads out the phase.
 
-```
-├── amplitude_estimation.py            # Entry point
-├── amplitude_estimation_class.py      # Core QAE algorithm (QPE + MLE)
-├── lib/                               # Framework base classes
-│   ├── algorithm_result.py
-│   ├── amplitude_estimator.py
-│   ├── estimation_problem.py
-│   └── utils.py
-└── assembly/
-    └── openqasm3/
-        └── amplitude_estimation.qasm  # Pre-exported OpenQASM 3.0 circuit
-```
+## What the example does
+
+This is a **reference implementation** — the algorithm handles any Bernoulli probability and any number of evaluation qubits. The defaults below are just the out-of-the-box configuration; change them via the CLI to study the precision/depth tradeoff.
+
+The example uses a **Bernoulli model** (the simplest amplitude estimation problem): a single-qubit A operator that rotates |0⟩ into a superposition with amplitude √p of the "good" state |1⟩. The algorithm reports the raw grid-based estimate, the MLE-refined continuous estimate, and a 95% Fisher confidence interval.
+
+## Default parameters
+
+| Parameter | Value |
+|-----------|-------|
+| Target probability (p) | 0.2 |
+| Evaluation qubits (m) | 3 (grid resolution 2^3 = 8 points) |
+| Shots | 1000 |
+
+With these defaults, the grid-based output snaps to the nearest point of the 8-point grid (~0.146), while the MLE post-processing typically recovers a value close to the true 0.2.
 
 ## Getting started
 
@@ -46,20 +49,35 @@ pip install -r requirements.lock
 python amplitude_estimation.py
 ```
 
-**Expected output:**
+### CLI options
 
 ```
-Target probability: 0.2
-Estimated: 0.1464466
-MLE estimate: 0.2
+python amplitude_estimation.py -p 0.35 -m 5 -S 5000
 ```
 
-The grid-based estimate snaps to the nearest QPE grid point (`0.146`), while the MLE refines it back to the true value (`0.2`).
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-p` / `--probability` | Target Bernoulli probability in (0, 1) | 0.2 |
+| `-m` / `--eval-qubits` | Number of evaluation qubits (grid = 2^m) | 3 |
+| `-S` / `--shots` | Shots for the QPE circuit (must be ≥ 1) | 1000 |
 
-## Key parameters
+Increasing `-m` improves precision but deepens the circuit. Increasing `-S` reduces sampling noise in the grid-based estimate and stabilizes the MLE refinement.
 
-- **`num_eval_qubits`** (default: `3`) — controls grid resolution. With $m = 3$ you get $2^3 = 8$ grid points. Increasing $m$ improves precision but deepens the circuit.
-- **`p`** (default: `0.2`) — the target probability to estimate. Try changing this to see how the algorithm adapts.
+## Project structure
+
+```
+├── amplitude_estimation.py            # Entry point (parameterized)
+├── amplitude_estimation_class.py      # Core QAE algorithm (QPE + MLE)
+├── qae_structure.png                  # Canonical algorithm diagram
+├── lib/                               # Framework base classes
+│   ├── algorithm_result.py
+│   ├── amplitude_estimator.py
+│   ├── estimation_problem.py
+│   └── utils.py
+└── assembly/
+    └── openqasm3/
+        └── amplitude_estimation.qasm  # Pre-exported OpenQASM 3.0 circuit
+```
 
 ## Dependencies
 

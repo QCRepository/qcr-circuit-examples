@@ -5,6 +5,8 @@ A variant of amplitude estimation that iteratively refines the estimate
 without requiring quantum phase estimation, using simpler Grover circuits.
 """
 
+import argparse
+
 import numpy as np
 from qiskit.circuit import QuantumCircuit
 from qiskit.primitives import Sampler
@@ -38,8 +40,32 @@ class BernoulliQ(QuantumCircuit):
 
 
 if __name__ == "__main__":
-    # Target probability to estimate
-    p = 0.2
+    parser = argparse.ArgumentParser(
+        description="Iterative Quantum Amplitude Estimation on a Bernoulli model."
+    )
+    parser.add_argument("-p", "--probability", type=float, default=0.2,
+                        help="Target probability to estimate, in (0, 1). Default: 0.2")
+    parser.add_argument("-e", "--epsilon", type=float, default=0.01,
+                        help="Target precision — half-width of the final confidence interval, in (0, 0.5]. Default: 0.01")
+    parser.add_argument("-a", "--alpha", type=float, default=0.05,
+                        help="Confidence level: the output lies within epsilon with probability >= 1-alpha, in (0, 1). Default: 0.05")
+    parser.add_argument("-S", "--shots", type=int, default=100,
+                        help="Shots per Grover-power round (must be >= 1). Default: 100")
+    args = parser.parse_args()
+
+    if not 0.0 < args.probability < 1.0:
+        parser.error(f"probability must be in (0, 1), got {args.probability}")
+    if not 0.0 < args.epsilon <= 0.5:
+        parser.error(f"epsilon must be in (0, 0.5], got {args.epsilon}")
+    if not 0.0 < args.alpha < 1.0:
+        parser.error(f"alpha must be in (0, 1), got {args.alpha}")
+    if args.shots < 1:
+        parser.error(f"shots must be >= 1, got {args.shots}")
+
+    p = args.probability
+    epsilon = args.epsilon
+    alpha = args.alpha
+    shots = args.shots
 
     A = BernoulliA(p)
     Q = BernoulliQ(p)
@@ -50,10 +76,14 @@ if __name__ == "__main__":
         objective_qubits=[0],
     )
 
-    sampler = Sampler()
+    # IMPORTANT: specify shots so IQAE runs its iterative loop. Without a shot
+    # budget the Sampler returns exact statevector quasi-probabilities and the
+    # IQAE code takes a shortcut that bypasses the Grover-power iterations —
+    # which defeats the whole point of this example.
+    sampler = Sampler(options={"shots": shots})
     iae = IterativeAmplitudeEstimation(
-        epsilon_target=0.01,  # target accuracy
-        alpha=0.05,  # confidence interval width
+        epsilon_target=epsilon,
+        alpha=alpha,
         sampler=sampler,
     )
 
@@ -61,12 +91,13 @@ if __name__ == "__main__":
 
     ci_lower, ci_upper = result.confidence_interval
     num_iterations = len(result.powers) - 1  # powers[0] = 0 is initial
+    confidence_pct = int(round((1 - alpha) * 100))
 
-    print(f"Iterative Amplitude Estimation — target p = {p}\n")
-    print(f"  Estimated:           {result.estimation:.6f}")
-    print(f"  Error:               {abs(result.estimation - p):.6f}")
-    print(f"  95% CI:              [{ci_lower:.6f}, {ci_upper:.6f}]  (width {ci_upper - ci_lower:.6f})")
-    print(f"  Target epsilon:      0.01")
-    print(f"  Oracle queries:      {result.num_oracle_queries}")
-    print(f"  Iterations:          {num_iterations}")
-    print(f"  Grover powers used:  {result.powers[1:]}")
+    print(f"Iterative Amplitude Estimation — Bernoulli p={p}, ε={epsilon}, α={alpha}, {shots} shots/round\n")
+    print(f"  Estimated:              {result.estimation:.6f}")
+    print(f"  Error:                  {abs(result.estimation - p):.6f}")
+    print(f"  {confidence_pct}% CI:                 [{ci_lower:.6f}, {ci_upper:.6f}]  (width {ci_upper - ci_lower:.6f})")
+    print(f"  Target precision (ε):   {epsilon}")
+    print(f"  Oracle queries:         {result.num_oracle_queries}")
+    print(f"  Iterations:             {num_iterations}")
+    print(f"  Grover powers used:     {result.powers[1:]}")

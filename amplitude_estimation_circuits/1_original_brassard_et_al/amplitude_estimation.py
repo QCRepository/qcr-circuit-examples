@@ -5,6 +5,8 @@ Estimates the amplitude a in A|0> = sqrt(1-a)|Psi_0> + sqrt(a)|Psi_1>
 using quantum phase estimation on the Grover operator.
 """
 
+import argparse
+
 import numpy as np
 from qiskit.circuit import QuantumCircuit
 from qiskit.primitives import Sampler
@@ -38,8 +40,27 @@ class BernoulliQ(QuantumCircuit):
 
 
 if __name__ == "__main__":
-    # Target probability to estimate
-    p = 0.2
+    parser = argparse.ArgumentParser(
+        description="Canonical Quantum Amplitude Estimation on a Bernoulli model."
+    )
+    parser.add_argument("-p", "--probability", type=float, default=0.2,
+                        help="Target probability to estimate, in (0, 1). Default: 0.2")
+    parser.add_argument("-m", "--eval-qubits", type=int, default=3,
+                        help="Number of evaluation qubits (grid resolution 2^m). Default: 3")
+    parser.add_argument("-S", "--shots", type=int, default=1000,
+                        help="Shots for the QPE circuit (must be >= 1). Default: 1000")
+    args = parser.parse_args()
+
+    if not 0.0 < args.probability < 1.0:
+        parser.error(f"probability must be in (0, 1), got {args.probability}")
+    if args.eval_qubits < 1:
+        parser.error(f"eval-qubits must be >= 1, got {args.eval_qubits}")
+    if args.shots < 1:
+        parser.error(f"shots must be >= 1, got {args.shots}")
+
+    p = args.probability
+    m = args.eval_qubits
+    shots = args.shots
 
     A = BernoulliA(p)
     Q = BernoulliQ(p)
@@ -50,11 +71,19 @@ if __name__ == "__main__":
         objective_qubits=[0],
     )
 
-    sampler = Sampler()
-    ae = AmplitudeEstimation(num_eval_qubits=3, sampler=sampler)
+    # Pass an explicit shots budget: with the default shots=None the Sampler returns
+    # exact statevector probabilities, and MLE recovers the target noiselessly —
+    # which hides the stochastic nature of real amplitude estimation.
+    sampler = Sampler(options={"shots": shots})
+    ae = AmplitudeEstimation(num_eval_qubits=m, sampler=sampler)
 
     result = ae.estimate(problem)
 
-    print(f"Target probability: {p}")
-    print(f"Estimated: {result.estimation}")
-    print(f"MLE estimate: {result.mle}")
+    ci_lower, ci_upper = result.confidence_interval
+
+    print(f"Canonical Amplitude Estimation — Bernoulli p={p}, {m} evaluation qubits, {shots} shots\n")
+    print(f"  Target probability:    {p}")
+    print(f"  Grid-based estimate:   {result.estimation:.6f}  (snaps to nearest of 2^{m} = {2 ** m} points)")
+    print(f"  MLE-refined estimate:  {result.mle:.6f}")
+    print(f"  Absolute error (MLE):  {abs(result.mle - p):.6f}")
+    print(f"  95% CI (Fisher):       [{ci_lower:.6f}, {ci_upper:.6f}]  (width {ci_upper - ci_lower:.6f})")
