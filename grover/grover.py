@@ -41,11 +41,21 @@ class GroversAlgorithm:
         self._init_parser(title, n_qubits, search, shots, fontsize, print_circuits, combine_states)
         self._args: Namespace = self._parser.parse_args()
 
-        # Set of nonnegative ints to search for
-        self.search: set[int] = set(self._args.search)
+        # Set of nonnegative ints to search for. Filter out any that don't fit
+        # in 2^n (e.g. user passes -n 3 -s 9 -- 9 is out of range for 3 qubits).
+        n_qubits_int = self._args.n_qubits
+        max_value = 2 ** n_qubits_int
+        requested = set(self._args.search)
+        out_of_range = {s for s in requested if s < 0 or s >= max_value}
+        if out_of_range:
+            self._parser.error(
+                f"search value(s) {sorted(out_of_range)} are out of range for "
+                f"{n_qubits_int} qubits (valid range: 0 to {max_value - 1})"
+            )
+        self.search: set[int] = requested
 
         # Set of m N-qubit binary strings representing target state(s) (i.e. self.search in base 2)
-        self._targets: set[str] = { f"{s:0{self._args.n_qubits}b}" for s in self.search }
+        self._targets: set[str] = { f"{s:0{n_qubits_int}b}" for s in self.search }
         
         # N-qubit quantum register
         self._qubits: qr = qr(self._args.n_qubits, "qubit")
@@ -295,8 +305,10 @@ class GroversAlgorithm:
         """
         Run Grover's algorithm simulation.
         """
-        # Simulate Grover's algorithm locally
-        backend = AerSimulator(method = "density_matrix")
+        # Simulate Grover's algorithm locally. No explicit method — Aer auto-selects
+        # (statevector for this pure-state unitary circuit), which scales as O(2^n)
+        # instead of the O(4^n) cost of a density-matrix simulator.
+        backend = AerSimulator()
 
         # Generate optimized grover circuit for simulation
         transpiled_circuit = transpile(self._grover(), backend, optimization_level = 2)
@@ -333,25 +345,25 @@ class GroversAlgorithm:
             print_circuits (bool): Whether or not to print quantum circuit(s).
             combine_states (bool): Whether to combine all non-winning states into 1 bar labeled "Others" or not.
         """
-        self._parser.add_argument("-H, --help",
+        self._parser.add_argument("-H", "--help",
                                   action = "help",
                                   help = "show this help message and exit")
 
-        self._parser.add_argument("-T, --title",
+        self._parser.add_argument("-T", "--title",
                                   type = str,
                                   default = title,
                                   dest = "title",
                                   metavar = "<title>",
                                   help = f"window title (default: \"{title}\")")
 
-        self._parser.add_argument("-n, --n-qubits",
+        self._parser.add_argument("-n", "--n-qubits",
                                   type = int,
                                   default = n_qubits,
                                   dest = "n_qubits",
                                   metavar = "<n_qubits>",
                                   help = f"number of qubits (default: {n_qubits})")
 
-        self._parser.add_argument("-s, --search",
+        self._parser.add_argument("-s", "--search",
                                   default = search,
                                   type = int,
                                   nargs = "+",
@@ -359,28 +371,28 @@ class GroversAlgorithm:
                                   metavar = "<search>",
                                   help = f"nonnegative integers to search for with Grover's algorithm (default: {search})")
 
-        self._parser.add_argument("-S, --shots",
+        self._parser.add_argument("-S", "--shots",
                                   type = int,
                                   default = shots,
                                   dest = "shots",
                                   metavar = "<shots>",
                                   help = f"amount of times the algorithm is simulated (default: {shots})")
 
-        self._parser.add_argument("-f, --font-size",
+        self._parser.add_argument("-f", "--font-size",
                                   type = int,
                                   default = fontsize,
                                   dest = "fontsize",
                                   metavar = "<font_size>",
                                   help = f"histogram's font size (default: {fontsize})")
 
-        self._parser.add_argument("-p, --print",
+        self._parser.add_argument("-p", "--print",
                                   action = BooleanOptionalAction,
                                   type = bool,
                                   default = print_circuits,
                                   dest = "print_circuits",
                                   help = f"whether or not to print quantum circuit(s) (default: {print_circuits})")
 
-        self._parser.add_argument("-c, --combine",
+        self._parser.add_argument("-c", "--combine",
                                   action = BooleanOptionalAction,
                                   type = bool,
                                   default = combine_states,
