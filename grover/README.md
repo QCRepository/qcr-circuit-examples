@@ -10,29 +10,36 @@ Beyond database search, Grover's algorithm serves as a universal subroutine: any
 
 The algorithm repeatedly applies two operations — the **Grover iterate** — to amplify the probability of measuring the target state(s):
 
-1. **Oracle** — marks the target states by flipping their phase: |t⟩ → −|t⟩ for each target t, leaving all other states unchanged. Implemented here via X gates (to make each target look like |1…1⟩), a multi-controlled Z gate, then the X gates again.
+1. **Oracle** (U_ω) — marks the target states by flipping their phase: |t⟩ → −|t⟩ for each target t, leaving all other states unchanged. Implemented here via X gates (to make each target look like |1…1⟩), a multi-controlled Z gate, then the X gates again.
 
-2. **Diffuser** (amplitude amplification) — reflects all amplitudes about their mean. Concretely: Hadamard all qubits, apply the oracle for the all-zeros state, Hadamard again. This "pushes" amplitude from non-target states toward target states.
+2. **Diffuser** (amplitude amplification) — reflects all amplitudes about their mean. Written in closed form, the diffuser is H⊗n · (2|0^n⟩⟨0^n| − I_n) · H⊗n — Hadamard all qubits, apply a phase flip on the all-zeros state, Hadamard again. This "pushes" amplitude from non-target states toward target states.
 
 After approximately (π/4)·√(N/M) iterations (where M is the number of target states), the targets have near-unit probability. Any more or fewer and the probability drops — the amplitude is literally rotating around a 2D subspace and overshooting reverses the amplification.
 
+![Grover's algorithm — canonical structure](./grover_structure.png)
+
 ## What the example does
 
-This implementation supports multiple simultaneous search targets and includes a full CLI for experimentation. By default it searches for items `{0, 3, 9, 11}` in a 5-qubit (N = 32) space, running 1000 shots with 2 Grover iterations (the integer optimum for these parameters).
+This implementation supports multiple simultaneous search targets and includes a full CLI for experimentation. The algorithm itself is not tied to any specific qubit count or target set — the defaults below are just the out-of-the-box configuration.
 
-The output reports problem setup, the theoretical hit rate sin²((2k+1)θ) where θ = arcsin(√(M/N)), the measured hit rate, and a per-target frequency table so you can verify the distribution matches theory at a glance.
+The output reports the problem setup, the theoretical hit rate sin²((2k+1)θ) where θ = arcsin(√(M/N)), the measured hit rate, and a per-target frequency table so you can verify the distribution matches theory at a glance.
 
-## Circuit structure
+## Default parameters
 
-At the top level, Grover is a fixed repeating pattern: initial Hadamards, then the Grover iterate (oracle + diffuser) repeated k times, then measurement.
+| Parameter | Value |
+|-----------|-------|
+| Qubits (n) | 5 (search space N = 32) |
+| Targets | {0, 3, 9, 11} (M = 4) |
+| Shots | 1000 |
+| Grover iterations | 2 (integer optimum of ⌊π/4 · √(N/M)⌋ = 2.22) |
 
-![Grover circuit](./circuit_diagram.png)
+With these defaults, the transpiled circuit (compound Oracle/Diffuser gates shown in purple, Hadamards in red) looks like:
 
-## Expected results
+![Grover circuit at default parameters](./circuit_diagram.png)
 
-With the default parameters, the 4 target states `{0, 3, 9, 11}` should dominate the measurement distribution — each appearing with roughly 24% probability, and the remaining ~5.5% spread thinly across the 28 non-target states:
+And the measured distribution — 4 target peaks at ~24% each, the remaining ~5.5% spread thinly across 28 non-target states — looks like:
 
-![Grover results histogram](./results_histogram.png)
+![Grover results histogram at default parameters](./results_histogram.png)
 
 The theoretical hit rate is sin²(5θ) ≈ 94.5% with θ = arcsin(√(1/8)), matching the measured rate to within sampling noise at 1000 shots.
 

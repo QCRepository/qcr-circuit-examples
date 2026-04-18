@@ -22,7 +22,7 @@ class GroversAlgorithm:
                  search: set[int] = { 11, 9, 0, 3 },
                  shots: int = 1000,
                  fontsize: int = 10,
-                 print: bool = False,
+                 print_circuits: bool = False,
                  combine_states: bool = False) -> None:
         """
         Simulate Grover's algorithm using Qiskit's AerSimulator.
@@ -31,14 +31,14 @@ class GroversAlgorithm:
             title (str, optional): Window title. Defaults to "Grover's Algorithm".
             n_qubits (int, optional): Number of qubits. Defaults to 5.
             search (set[int], optional): Set of nonnegative integers to search for using Grover's algorithm. Defaults to { 11, 9, 0, 3 }.
-            shots (int, optional): Amount of times the algorithm is simulated. Defaults to 10000.
+            shots (int, optional): Amount of times the algorithm is simulated. Defaults to 1000.
             fontsize (int, optional): Histogram's font size. Defaults to 10.
-            print (bool, optional): Whether or not to print quantum circuit(s). Defaults to False.
+            print_circuits (bool, optional): Whether or not to print quantum circuit(s). Defaults to False.
             combine_states (bool, optional): Whether to combine all non-winning states into 1 bar labeled "Others" or not. Defaults to False.
         """
         # Parsing command line arguments
         self._parser: ArgumentParser = ArgumentParser(description = "Run grover's algorithm via command line", add_help = False)
-        self._init_parser(title, n_qubits, search, shots, fontsize, print, combine_states)
+        self._init_parser(title, n_qubits, search, shots, fontsize, print_circuits, combine_states)
         self._args: Namespace = self._parser.parse_args()
 
         # Set of nonnegative ints to search for
@@ -98,7 +98,7 @@ class GroversAlgorithm:
                     oracle.x(i)
 
         # Display oracle, if applicable
-        if self._args.print: self._print_circuit(oracle, "ORACLE")
+        if self._args.print_circuits: self._print_circuit(oracle, "ORACLE")
 
         return oracle
 
@@ -122,8 +122,8 @@ class GroversAlgorithm:
         diffuser.h(self._qubits)
         
         # Display diffuser, if applicable
-        if self._args.print: self._print_circuit(diffuser, "DIFFUSER")
-        
+        if self._args.print_circuits: self._print_circuit(diffuser, "DIFFUSER")
+
         return diffuser
 
     def _grover(self) -> qc:
@@ -155,8 +155,8 @@ class GroversAlgorithm:
         grover.measure_all()
 
         # Display grover circuit, if applicable
-        if self._args.print: self._print_circuit(grover, "GROVER CIRCUIT")
-        
+        if self._args.print_circuits: self._print_circuit(grover, "GROVER CIRCUIT")
+
         return grover
 
     def _outcome(self, winners: list[str], counts: Counts) -> None:
@@ -319,7 +319,7 @@ class GroversAlgorithm:
                      search: set[int],
                      shots: int,
                      fontsize: int,
-                     print: bool,
+                     print_circuits: bool,
                      combine_states: bool) -> None:
         """
         Helper method to initialize command line argument parser.
@@ -330,7 +330,7 @@ class GroversAlgorithm:
             search (set[int]): Set of nonnegative integers to search for using Grover's algorithm.
             shots (int): Amount of times the algorithm is simulated.
             fontsize (int): Histogram's font size.
-            print (bool): Whether or not to print quantum circuit(s).
+            print_circuits (bool): Whether or not to print quantum circuit(s).
             combine_states (bool): Whether to combine all non-winning states into 1 bar labeled "Others" or not.
         """
         self._parser.add_argument("-H, --help",
@@ -376,9 +376,9 @@ class GroversAlgorithm:
         self._parser.add_argument("-p, --print",
                                   action = BooleanOptionalAction,
                                   type = bool,
-                                  default = print,
-                                  dest = "print",
-                                  help = f"whether or not to print quantum circuit(s) (default: {print})")
+                                  default = print_circuits,
+                                  dest = "print_circuits",
+                                  help = f"whether or not to print quantum circuit(s) (default: {print_circuits})")
 
         self._parser.add_argument("-c, --combine",
                                   action = BooleanOptionalAction,
